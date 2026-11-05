@@ -150,12 +150,10 @@ const SITE = {
   footer: "사진과 설명은 탐구에 참여한 학생들이 직접 작성한 자료입니다."
 };
 
-/* 학생 자료는 이 목록만 고치면 됩니다.
-   image: 이 파일과 같은 폴더의 images 폴더에 넣은 사진 경로
-   description: 빈 줄을 넣으면 문단이 나뉩니다. */
+/* image 폴더 안에 있는 한글 파일명과 정확히 일치하도록 경로 수정 완료 */
 const SPECIMENS = [
   {
-    image: "images/pine.jpg",
+    image: "image/소나무.jpg",
     name: "소나무",
     latin: "Pinus densiflora",
     category: "식물",
@@ -163,7 +161,7 @@ const SPECIMENS = [
     description: "탐구 설명을 입력하세요."
   },
   {
-    image: "images/crabapple.jpg",
+    image: "image/꽃사과.jpg",
     name: "꽃사과",
     latin: "",
     category: "식물",
@@ -171,7 +169,7 @@ const SPECIMENS = [
     description: "탐구 설명을 입력하세요."
   },
   {
-    image: "images/grasshopper.jpg",
+    image: "image/방아깨비.jpg",
     name: "방아깨비",
     latin: "Acrida cinerea",
     category: "곤충",
@@ -179,7 +177,7 @@ const SPECIMENS = [
     description: "탐구 설명을 입력하세요."
   },
   {
-    image: "images/cicada.jpg",
+    image: "image/매미.jpg",
     name: "매미",
     latin: "",
     category: "곤충",
@@ -187,7 +185,7 @@ const SPECIMENS = [
     description: "탐구 설명을 입력하세요."
   },
   {
-    image: "images/ant.jpg",
+    image: "image/개미.jpg",
     name: "개미",
     latin: "",
     category: "곤충",
@@ -195,7 +193,7 @@ const SPECIMENS = [
     description: "탐구 설명을 입력하세요."
   },
   {
-    image: "images/spider.jpg",
+    image: "image/거미.jpg",
     name: "거미",
     latin: "",
     category: "곤충 외 무척추동물",
@@ -203,7 +201,7 @@ const SPECIMENS = [
     description: "탐구 설명을 입력하세요."
   },
   {
-    image: "images/pillbug.jpg",
+    image: "image/공벌레.jpg",
     name: "공벌레",
     latin: "Armadillidium vulgare",
     category: "곤충 외 무척추동물",
@@ -211,7 +209,7 @@ const SPECIMENS = [
     description: "탐구 설명을 입력하세요."
   },
   {
-    image: "images/earthworm.jpg",
+    image: "image/지렁이.jpg",
     name: "지렁이",
     latin: "",
     category: "곤충 외 무척추동물",
@@ -219,7 +217,7 @@ const SPECIMENS = [
     description: "탐구 설명을 입력하세요."
   },
   {
-    image: "images/sparrow.jpg",
+    image: "image/참새.jpg",
     name: "참새",
     latin: "Passer montanus",
     category: "조류",
@@ -227,7 +225,7 @@ const SPECIMENS = [
     description: "탐구 설명을 입력하세요."
   },
   {
-    image: "images/swallow.jpg",
+    image: "image/제비.jpg",
     name: "제비",
     latin: "Hirundo rustica",
     category: "조류",
@@ -235,7 +233,7 @@ const SPECIMENS = [
     description: "탐구 설명을 입력하세요."
   },
   {
-    image: "images/pigeon.jpg",
+    image: "image/비둘기.jpg",
     name: "비둘기",
     latin: "Columba livia",
     category: "조류",
@@ -243,7 +241,7 @@ const SPECIMENS = [
     description: "탐구 설명을 입력하세요."
   },
   {
-    image: "images/human.jpg",
+    image: "image/사람.jpg",
     name: "사람",
     latin: "Homo sapiens",
     category: "포유류",
@@ -268,7 +266,7 @@ const cardHTML = (s, i) => `
     <div class="plate">
       <span class="stand-in" aria-hidden="true">${esc(s.name.charAt(0))}</span>
       <img src="${esc(s.image)}" alt="${esc(s.name)}" loading="lazy" decoding="async"
-           onload="this.classList.add('loaded')" onerror="this.parentElement.classList.add('is-missing')">
+            onload="this.classList.add('loaded')" onerror="this.parentElement.classList.add('is-missing')">
     </div>
     <div class="label">
       <h2>${esc(s.name)}</h2>
