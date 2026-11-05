@@ -67,7 +67,7 @@ img { display: block; max-width: 100%; }
 .facts dt { color: var(--muted); }
 .facts dd { margin: 0; }
 .empty { text-align: center; color: var(--muted); padding: 80px 24px; }
-.foot { border-top: 1px solid var(--line); padding-block: 28px; color: var(--muted); font-size: .88rem; }
+.foot { border-top: 1px solid var(--line); padding-block: 28px; color: var(--muted); font-size: .88rem; white-space: pre-line; }
 
 /* 확대 보기 */
 .viewer { width: min(1120px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); padding: 0; border: 0; border-radius: 6px; background: var(--card); color: var(--ink); box-shadow: 0 30px 80px rgba(10, 22, 17, .35); }
@@ -147,10 +147,9 @@ img { display: block; max-width: 100%; }
 const SITE = {
   title: "운암고 봉사활동 프로젝트",
   intro: "학교 안의 생물들을 생명공학의 눈으로 관찰하고 기록한 학생들의 탐구 결과입니다!",
-  footer: "사진과 설명은 탐구에 참여한 학생들이 직접 작성한 자료입니다!"\n"클릭해서 더 자세히 보실 수 있습니다.!"
+  footer: `사진과 설명은 탐구에 참여한 학생들이 직접 작성한 자료입니다!\n클릭해서 더 자세히 보실 수 있습니다!`
 };
 
-/* image 폴더 안에 있는 한글 파일명과 정확히 일치하도록 경로 수정 완료 */
 const SPECIMENS = [
   {
     image: "image/소나무.jpg",
@@ -174,7 +173,7 @@ const SPECIMENS = [
     latin: "Acrida cinerea",
     category: "곤충",
     place: "", keywords: "", credit: "",
-    description: "방아깨비는 개미와 달리 무리를 짓지 않고 혼자 살아며, 건드리면 몸을 방아 찧듯 까딱거리는 특징을 가진 초식성 메뚜기과 곤충입니다."
+    description: "방아깨비는 개미와 달리 무리를 짓지 않고 혼자 살아며, 건드리면 몸을 방아 짓듯 까딱거리는 특징을 가진 초식성 메뚜기과 곤충입니다."
   },
   {
     image: "image/매미.jpg",
@@ -290,6 +289,7 @@ function render() {
 
 function fillViewer() {
   const s = visible[current];
+  if (!s) return;
   $("v-plate").classList.remove("is-missing");
   $("v-img").src = s.image;
   $("v-img").alt = s.name;
