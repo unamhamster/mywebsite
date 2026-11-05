@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>운암고 생명공학 탐구 아카이브</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Noto+Serif+KR:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --paper: #f2f4ef;
+  --card: #fbfcf9;
+  --ink: #1e2b25;
+  --muted: #5f6f66;
+  --line: #d3dcd4;
+  --plate: #e2e9e1;
+  --accent: #1f6b62;
+  color-scheme: light;
+}
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font: 400 16px/1.7 "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  word-break: keep-all;
+}
+button, input { font: inherit; color: inherit; }
+img { display: block; max-width: 100%; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.wrap { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+/* 머리말 */
+.masthead { padding-top: clamp(56px, 9vw, 104px); padding-bottom: 36px; }
+.masthead h1 { margin: 0 0 14px; font: 700 clamp(2.1rem, 4.8vw, 3.4rem)/1.2 "Noto Serif KR", serif; letter-spacing: -0.01em; text-wrap: balance; }
+.masthead p { margin: 0; max-width: 36em; color: var(--muted); }
+
+/* 필터 막대 */
+.toolbar { position: sticky; top: 0; z-index: 5; background: color-mix(in srgb, var(--paper) 88%, transparent); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border-block: 1px solid var(--line); }
+.toolbar .wrap { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 24px; padding-block: 14px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { border: 1px solid var(--line); background: transparent; border-radius: 999px; padding: 6px 15px; font-size: .92rem; cursor: pointer; transition: background .2s, color .2s, border-color .2s; }
+.chip:hover { border-color: var(--accent); }
+.chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+.tools { display: flex; align-items: center; gap: 14px; }
+.search input { width: min(260px, 62vw); padding: 8px 16px; border: 1px solid var(--line); border-radius: 999px; background: var(--card); outline: none; }
+.search input:focus-visible { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent); }
+.count { font-size: .9rem; color: var(--muted); white-space: nowrap; }
+
+/* 표본 카드 */
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 28px; padding-block: 40px 88px; }
+.specimen { background: var(--card); border: 1px solid var(--line); border-radius: 4px; padding: 10px 10px 4px; cursor: pointer; outline: none; transition: border-color .2s, box-shadow .2s; }
+.specimen:hover { border-color: color-mix(in srgb, var(--accent) 55%, var(--line)); }
+.specimen:focus-visible { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent); }
+.plate { position: relative; aspect-ratio: 4 / 3; background: var(--plate); border-radius: 2px; overflow: hidden; }
+.plate img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.plate.is-missing img { display: none; }
+.stand-in { position: absolute; inset: 0; display: grid; place-items: center; font: 600 3.2rem/1 "Noto Serif KR", serif; color: color-mix(in srgb, var(--accent) 38%, transparent); }
+.specimen img { opacity: 0; transition: opacity .5s ease; }
+.specimen img.loaded { opacity: 1; }
+.label { display: grid; gap: 10px; padding: 18px 8px; }
+.label h2, .viewer-info h2 { margin: 0; font: 700 1.3rem/1.3 "Noto Serif KR", serif; }
+.latin { margin: 0; font: italic 400 .98rem/1.4 Georgia, "Noto Serif KR", serif; color: var(--muted); }
+.summary { margin: 0; font-size: .95rem; color: #34443c; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.facts { display: grid; grid-template-columns: 4.2em 1fr; gap: 6px 12px; margin: 4px 0 0; font-size: .88rem; }
+.facts dt { color: var(--muted); }
+.facts dd { margin: 0; }
+.empty { text-align: center; color: var(--muted); padding: 80px 24px; }
+.foot { border-top: 1px solid var(--line); padding-block: 28px; color: var(--muted); font-size: .88rem; }
+
+/* 확대 보기 */
+.viewer { width: min(1120px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); padding: 0; border: 0; border-radius: 6px; background: var(--card); color: var(--ink); box-shadow: 0 30px 80px rgba(10, 22, 17, .35); }
+.viewer::backdrop { background: rgba(12, 22, 17, .7); backdrop-filter: blur(3px); }
+.viewer[open] { animation: lift .3s cubic-bezier(.2, .7, .2, 1); }
+@keyframes lift { from { opacity: 0; transform: translateY(10px); } }
+.viewer-grid { display: grid; grid-template-columns: 1.2fr 1fr; max-height: calc(100dvh - 32px); overflow: auto; }
+.viewer .plate { aspect-ratio: auto; min-height: 420px; border-radius: 0; }
+.viewer .plate img { object-fit: contain; }
+.viewer-info { display: flex; flex-direction: column; gap: 16px; padding: 44px 40px 32px; }
+.viewer-info h2 { font-size: 1.8rem; line-height: 1.25; }
+.v-text { max-width: 34em; font-size: .98rem; }
+.v-text p { margin: 0 0 .9em; }
+.v-nav { display: flex; align-items: center; gap: 10px; margin-top: auto; padding-top: 12px; }
+.v-nav button { border: 1px solid var(--line); background: transparent; border-radius: 999px; padding: 8px 18px; cursor: pointer; }
+.v-nav button:hover { border-color: var(--accent); color: var(--accent); }
+#v-count { margin-inline: auto; color: var(--muted); font-size: .9rem; }
+.v-close { position: absolute; top: 12px; right: 12px; z-index: 2; border: 0; background: transparent; border-radius: 999px; padding: 8px 14px; color: var(--muted); cursor: pointer; }
+.v-close:hover { color: var(--ink); background: var(--plate); }
+
+@media (max-width: 760px) {
+  .viewer-grid { grid-template-columns: 1fr; }
+  .viewer .plate { min-height: 0; height: min(56vh, 420px); }
+  .viewer-info { padding: 24px 22px; }
+  .viewer-info h2 { font-size: 1.5rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}
+</style>
+</head>
+<body>
+<header class="masthead wrap">
+  <h1 id="site-title"></h1>
+  <p id="site-intro"></p>
+</header>
+
+<div class="toolbar">
+  <div class="wrap">
+    <div class="chips" id="chips" role="group" aria-label="분류 선택"></div>
+    <div class="tools">
+      <label class="search">
+        <span class="sr-only">표본 검색</span>
+        <input id="search" type="search" placeholder="이름, 학명, 키워드로 찾기" autocomplete="off">
+      </label>
+      <span class="count" id="count" aria-live="polite"></span>
+    </div>
+  </div>
+</div>
+
+<main class="wrap grid" id="grid"></main>
+<p class="wrap empty" id="empty" hidden>검색 결과가 없습니다. 다른 단어로 찾아보세요.</p>
+<footer class="wrap foot" id="site-footer"></footer>
+
+<dialog class="viewer" id="viewer" aria-labelledby="v-name">
+  <button class="v-close" id="v-close" type="button">닫기</button>
+  <div class="viewer-grid">
+    <div class="plate" id="v-plate">
+      <span class="stand-in" id="v-stand" aria-hidden="true"></span>
+      <img id="v-img" alt="">
+    </div>
+    <div class="viewer-info">
+      <h2 id="v-name"></h2>
+      <p class="latin" id="v-latin"></p>
+      <div class="v-text" id="v-text"></div>
+      <dl class="facts" id="v-facts"></dl>
+      <div class="v-nav">
+        <button type="button" id="v-prev">이전</button>
+        <span id="v-count"></span>
+        <button type="button" id="v-next">다음</button>
+      </div>
+    </div>
+  </div>
+</dialog>
+
+<script>
+const SITE = {
+  title: "운암고 생명공학 탐구 아카이브",
+  intro: "학교 안의 생물을 생명공학의 눈으로 관찰하고 기록한 학생들의 탐구 결과입니다.",
+  footer: "사진과 설명은 탐구에 참여한 학생들이 직접 작성한 자료입니다."
+};
+
+/* 학생 자료는 이 목록만 고치면 됩니다.
+   image: 이 파일과 같은 폴더의 images 폴더에 넣은 사진 경로
+   description: 빈 줄을 넣으면 문단이 나뉩니다. */
+const SPECIMENS = [
+  {
+    image: "images/pine.jpg",
+    name: "소나무",
+    latin: "Pinus densiflora",
+    category: "식물",
+    place: "", keywords: "", credit: "",
+    description: "탐구 설명을 입력하세요."
+  },
+  {
+    image: "images/crabapple.jpg",
+    name: "꽃사과",
+    latin: "",
+    category: "식물",
+    place: "", keywords: "", credit: "",
+    description: "탐구 설명을 입력하세요."
+  },
+  {
+    image: "images/grasshopper.jpg",
+    name: "방아깨비",
+    latin: "Acrida cinerea",
+    category: "곤충",
+    place: "", keywords: "", credit: "",
+    description: "탐구 설명을 입력하세요."
+  },
+  {
+    image: "images/cicada.jpg",
+    name: "매미",
+    latin: "",
+    category: "곤충",
+    place: "", keywords: "", credit: "",
+    description: "탐구 설명을 입력하세요."
+  },
+  {
+    image: "images/ant.jpg",
+    name: "개미",
+    latin: "",
+    category: "곤충",
+    place: "", keywords: "", credit: "",
+    description: "탐구 설명을 입력하세요."
+  },
+  {
+    image: "images/spider.jpg",
+    name: "거미",
+    latin: "",
+    category: "곤충 외 무척추동물",
+    place: "", keywords: "", credit: "",
+    description: "탐구 설명을 입력하세요."
+  },
+  {
+    image: "images/pillbug.jpg",
+    name: "공벌레",
+    latin: "Armadillidium vulgare",
+    category: "곤충 외 무척추동물",
+    place: "", keywords: "", credit: "",
+    description: "탐구 설명을 입력하세요."
+  },
+  {
+    image: "images/earthworm.jpg",
+    name: "지렁이",
+    latin: "",
+    category: "곤충 외 무척추동물",
+    place: "", keywords: "", credit: "",
+    description: "탐구 설명을 입력하세요."
+  },
+  {
+    image: "images/sparrow.jpg",
+    name: "참새",
+    latin: "Passer montanus",
+    category: "조류",
+    place: "", keywords: "", credit: "",
+    description: "탐구 설명을 입력하세요."
+  },
+  {
+    image: "images/swallow.jpg",
+    name: "제비",
+    latin: "Hirundo rustica",
+    category: "조류",
+    place: "", keywords: "", credit: "",
+    description: "탐구 설명을 입력하세요."
+  },
+  {
+    image: "images/pigeon.jpg",
+    name: "비둘기",
+    latin: "Columba livia",
+    category: "조류",
+    place: "", keywords: "", credit: "",
+    description: "탐구 설명을 입력하세요."
+  },
+  {
+    image: "images/human.jpg",
+    name: "사람",
+    latin: "Homo sapiens",
+    category: "포유류",
+    place: "", keywords: "", credit: "",
+    description: "탐구 설명을 입력하세요."
+  }
+];
+
+const $ = id => document.getElementById(id);
+const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+const CATEGORIES = ["전체", ...new Set(SPECIMENS.map(s => s.category))];
+
+let filter = "전체", query = "", visible = [], current = 0, returnFocus = null;
+
+const factsHTML = s => [["분류", s.category], ["장소", s.place], ["키워드", s.keywords], ["기록", s.credit]]
+  .filter(([, v]) => v)
+  .map(([k, v]) => `<dt>${k}</dt><dd>${esc(v)}</dd>`)
+  .join("");
+
+const cardHTML = (s, i) => `
+  <article class="specimen" tabindex="0" role="button" data-i="${i}" aria-label="${esc(s.name)} 자세히 보기">
+    <div class="plate">
+      <span class="stand-in" aria-hidden="true">${esc(s.name.charAt(0))}</span>
+      <img src="${esc(s.image)}" alt="${esc(s.name)}" loading="lazy" decoding="async"
+           onload="this.classList.add('loaded')" onerror="this.parentElement.classList.add('is-missing')">
+    </div>
+    <div class="label">
+      <h2>${esc(s.name)}</h2>
+      ${s.latin ? `<p class="latin">${esc(s.latin)}</p>` : ""}
+      <p class="summary">${esc(s.description.replace(/\s+/g, " "))}</p>
+      <dl class="facts">${factsHTML(s)}</dl>
+    </div>
+  </article>`;
+
+function render() {
+  const q = query.trim().toLowerCase();
+  visible = SPECIMENS.filter(s => {
+    const inCategory = filter === "전체" || s.category === filter;
+    const text = [s.name, s.latin, s.category, s.place, s.keywords, s.description].join(" ").toLowerCase();
+    return inCategory && text.includes(q);
+  });
+  $("grid").innerHTML = visible.map((s, i) => cardHTML(s, i)).join("");
+  $("count").textContent = `${visible.length}개 표본`;
+  $("empty").hidden = visible.length > 0;
+}
+
+function fillViewer() {
+  const s = visible[current];
+  $("v-plate").classList.remove("is-missing");
+  $("v-img").src = s.image;
+  $("v-img").alt = s.name;
+  $("v-stand").textContent = s.name.charAt(0);
+  $("v-name").textContent = s.name;
+  $("v-latin").textContent = s.latin || "";
+  $("v-latin").hidden = !s.latin;
+  $("v-text").innerHTML = s.description.split(/\n\s*\n/).map(p => `<p>${esc(p)}</p>`).join("");
+  $("v-facts").innerHTML = factsHTML(s);
+  $("v-count").textContent = `${current + 1} / ${visible.length}`;
+}
+
+function openViewer(i) {
+  returnFocus = document.activeElement;
+  current = i;
+  fillViewer();
+  $("viewer").showModal();
+}
+
+function step(d) {
+  current = (current + d + visible.length) % visible.length;
+  fillViewer();
+}
+
+/* 초기화 */
+document.title = SITE.title;
+$("site-title").textContent = SITE.title;
+$("site-intro").textContent = SITE.intro;
+$("site-footer").textContent = SITE.footer;
+
+$("chips").innerHTML = CATEGORIES.map(c =>
+  `<button class="chip" type="button" data-cat="${esc(c)}" aria-pressed="${c === filter}">${esc(c)}</button>`).join("");
+$("chips").addEventListener("click", e => {
+  const chip = e.target.closest(".chip");
+  if (!chip) return;
+  filter = chip.dataset.cat;
+  document.querySelectorAll(".chip").forEach(b => b.setAttribute("aria-pressed", String(b === chip)));
+  render();
+});
+
+$("search").addEventListener("input", e => { query = e.target.value; render(); });
+
+$("grid").addEventListener("click", e => {
+  const card = e.target.closest(".specimen");
+  if (card) openViewer(Number(card.dataset.i));
+});
+$("grid").addEventListener("keydown", e => {
+  if ((e.key === "Enter" || e.key === " ") && e.target.classList.contains("specimen")) {
+    e.preventDefault();
+    openViewer(Number(e.target.dataset.i));
+  }
+});
+
+const viewer = $("viewer");
+$("v-prev").onclick = () => step(-1);
+$("v-next").onclick = () => step(1);
+$("v-close").onclick = () => viewer.close();
+$("v-img").onerror = () => $("v-plate").classList.add("is-missing");
+viewer.addEventListener("keydown", e => {
+  if (e.key === "ArrowLeft") step(-1);
+  if (e.key === "ArrowRight") step(1);
+});
+viewer.addEventListener("click", e => { if (e.target === viewer) viewer.close(); });
+viewer.addEventListener("close", () => { if (returnFocus?.isConnected) returnFocus.focus(); });
+
+render();
+</script>
+</body>
+</html>
